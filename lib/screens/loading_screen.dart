@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:labs_clima/screens/location_screen.dart';
 import '../services/location.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert' as convert;
-import '../services/networking.dart';
+import '../services/weather.dart';
 
 class LoadingScreen extends StatefulWidget {
   LoadingScreen({Key key}) : super(key: key);
@@ -14,9 +13,6 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  var latitude;
-  var longitude;
-
   @override
   void initState() {
     super.initState();
@@ -24,15 +20,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   void getLocationData() async {
-    Location location = Location();
-    await location.getCurrentLocation();
-    latitude = location.latitude;
-    longitude = location.longitude;
-    var apikey = env['APIKEY'];
-    NetworkHelper networkHelper = NetworkHelper(
-        "https://api.openweathermap.org/data/2.5/weather?units=metric&lat=${latitude}&lon=${longitude}&appid=${apikey}");
+    // WeatherModel weatherModel = WeatherModel();
 
-    var weatherData = await networkHelper.getData();
+    var weatherData = await WeatherModel().getWeather();
 
     Navigator.push(
       context,
@@ -54,10 +44,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Text(
-              //   "CLIMA",
-              //   style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-              // ),
               CircularProgressIndicator(
                 strokeWidth: 6,
                 valueColor:

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:charcode/ascii.dart' as ascii;
+// import 'package:charcode/ascii.dart' as ascii;
+import '../services/weather.dart';
 
 class LocationScreen extends StatefulWidget {
   LocationScreen({this.locationWeather});
@@ -11,11 +12,15 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
+  WeatherModel weather = WeatherModel();
+
   var description;
   int temp;
   var feelsLike;
   var humidity;
   var city;
+  var condition;
+  var weatherIcon;
 
   @override
   void initState() {
@@ -30,6 +35,9 @@ class _LocationScreenState extends State<LocationScreen> {
     feelsLike = weatherData['main']['feels_like'];
     humidity = weatherData['main']['humidity'];
     city = weatherData['name'];
+    condition = weatherData['cod'];
+
+    weatherIcon = weather.getWeatherIcon(condition);
   }
 
   @override
@@ -75,10 +83,7 @@ class _LocationScreenState extends State<LocationScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           new Container(),
-                          Icon(
-                            Icons.cloud_rounded,
-                            size: 50,
-                          ),
+                          Image.network("${weatherIcon}"),
                           Text(
                             "${temp}°C",
                             // textAlign: TextAlign.center,
@@ -101,9 +106,43 @@ class _LocationScreenState extends State<LocationScreen> {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w100),
                 ),
               ),
+              Container(
+                padding: EdgeInsets.all(0),
+                margin: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                child: //Card(
+                    //child:
+                    Column(
+                  children: [
+                    Center(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          filled: true,
+                          // fillColor: Colors.white,
+                          icon: Icon(Icons.search_rounded),
+                          hintText: "Custom location...",
+                          // border: OutlineInputBorder(
+                          //   borderRadius: BorderRadius.all(
+                          //     Radius.circular(5),
+                          //   ),
+                          // ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                //),
+              )
             ],
             crossAxisAlignment: CrossAxisAlignment.end,
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          splashColor: Colors.orange,
+          child: Icon(Icons.gps_fixed),
+          onPressed: () async {
+            var weatherData = await weather.getWeather();
+            update(weatherData);
+          },
         ),
       ),
     );
